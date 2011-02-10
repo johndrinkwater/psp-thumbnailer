@@ -1,16 +1,29 @@
-#!/usr/bin/python
-# coding=UTF-8
-#
-# psp-thumbnailer makes thumbnails for PSP files (EBOOT.PBP)
-#
-# Author: John Drinkwater, john@nextraweb.com
-# Licence: GPL v3
-# Licence URL: http://www.gnu.org/licenses/gpl-3.0.html
-#
+#! /usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+	psp-thumbnailer, makes thumbnails for PSP files (EBOOT.PBP)
+
+   	© 2010‐2011 John Drinkwater <john@nextraweb.com>
+	http://johndrinkwater.name/code/psp-thumbnailer/
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Affero General Public License as
+	published by the Free Software Foundation, either version 3 of the
+	License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Affero General Public License for more details.
+
+	You should have received a copy of the GNU Affero General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 import os, sys, getopt, gconf, struct
 
 __version__ = "0.01"
 
+# TODO include --install option
 def printusage():
 	print "psp-thumbnailer %s" % __version__
 	print "Usage: %s <EBOOT.PBP> <OUTPUT>" % os.path.basename( __file__ )
@@ -29,10 +42,11 @@ if __name__ == '__main__':
 
 	debugging = False
 	if debugging is True:
-		export = open( os.path.expanduser( '~/.pspthumbnailerlog' ), 'a' )
-		export.write( str( sys.argv ) )
-		export.write( "\n" )
+		logging = open( os.path.expanduser( '~/.pspthumbnailerlog' ), 'a' )
+		logging.write( str( sys.argv ) )
+		logging.write( "\n" )
 
+	# TODO move this into a function
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], 'h', ["help", "install"])
 	except getopt.GetoptError, err:
@@ -57,12 +71,13 @@ if __name__ == '__main__':
 	try:
 		pspfile = open( pbpfile, 'rb' )
 		header = pspfile.read(40)
-		# verify we’re a PBP file?
+		# TODO verify we’re a PBP file?
 
 		thumbnaillocation = struct.unpack('<l', header[12:16])[0]
 		thumbnailend = struct.unpack('<l', header[16:20])[0]
-		print thumbnailend, thumbnaillocation
+		
 		pspfile.seek(thumbnaillocation)
+		# TODO verify this is an image file
 		thumbnaildata = pspfile.read( (thumbnailend - thumbnaillocation) )
 		outfile = open( output, 'w' )
 		outfile.write( thumbnaildata )
@@ -73,6 +88,6 @@ if __name__ == '__main__':
 	outfile.close()
 
 	if debugging is True:
-		if export:
-			export.close()
+		if logging:
+			logging.close()
 
